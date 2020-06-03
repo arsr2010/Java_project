@@ -13,3 +13,18 @@ spec:
   template:
     metadata:
       labels:
+        app: {{ .Values.service.name }}
+    spec:
+    {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecrets }}
+    {{- end }}
+      containers: 
+        - name:  {{ .Values.service.name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy:  {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort:  {{ .Values.port }}
+              protocol: TCP
+              
