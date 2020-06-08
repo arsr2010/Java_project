@@ -1,0 +1,67 @@
+sudo: required
+language: java
+os: linux
+dist: bionic
+jdk:
+  - openjdk8
+branches:
+  only:
+  - development
+  - qa
+  - stg
+services:
+  - docker
+sudo: required
+env:
+  global:
+  - M2_HOME=/usr/local/bin/maven  DOCKER_IMAGE=earn-servicce-tr RELEASE=earn-service NAMESPACE=loyalty-dev IMAGE_PULL_SECRET=imagepullsecret DOCKER_VREPO="https://hbc-hbc-docker-v-ei.jfrog.io" IMAGE_TAG=${TRAVIS_COMMIT} HELM_VREPO="HTTPS://hbc.jfrog.io/hbc/hbc-helm-v-ei"
+before_install:
+  - export: M2_HOME=/usr/share/maven
+  - wget https://dl.bintray.com/jfrog/jfrog-cli-go/1.7.1/jfrog-cli-linux-amd64/jfrog
+  - chmod +x jfrog
+  - export PATH=$PATH:/$HOME/.local/bin
+  - ./jfrog rt config --url $ARTIFACTORY_URL --user $ARIFACTORY_USER -apikey $ARTIFACTORY_PASSWORD  --interactive false
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg |sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confew" install docker-ce
+install: true
+script:
+  - mvn clean deploy --settings settings.xml || travis_terminate 1;
+  - docker build -t ${DOCKER_IMAGE}:latest . || travis_terminate 1;
+#after_success
+  - GIT_COMMIT=${TRAVIS_COMMIT::-34}
+  - echo $GIT_COMMIT
+  - docker login hbc-hbc-docker-ei.jfrog.io  -u ${DOCKER_USER}  -p ${DOCKER_PASSWORD}
+  - docker tag ${DOCKER_IMAGE}:latest hbc-hbc-docker-ei.jfrog.io/${DOCKER_IMAGE}:${GIT_COMMIT}
+  - docker push hbc-hbc-docker-v-ei.jfrog.io/${DOCKER_IMAGE}:${GIT_COMMIT} || travis_terminate 1;
+  - echo "docker build successfull"
+  - curl -Lo kubectl https://storage.googlerapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+  - mkdir ${HOME}/.kube
+  - cp config ${HOME}/.kube/config
+  - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+  - chmod 700 get_helm.sh
+  - ./get_helm.sh
+  - DIR=/home/travis/.m2/helmrepo
+  - if [[ ! d "${DIR}  ]]; then mkdir "$DIR"; FI
+  - helm package k8s/ -d home/travis/.m2/helmrepo/
+  - echo "package build successful"
+  - cd home/travis/.m2/helmrepo/
+  - curl https://hbc.jfrog.io/
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
