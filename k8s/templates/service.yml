@@ -1,0 +1,18 @@
+---
+apiVersion:
+kind: service
+metadata:
+  name: {{ Vlaues.service.name }}-svc
+  namespace: {{ .Values.service.namespace  }}
+  labels:
+    app: {{ .Values.service.name }}
+    service: {{ .Values.service.name }}-svc
+spec:
+  selector:
+    app: {{ .Values.service.name }}
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+--- 
