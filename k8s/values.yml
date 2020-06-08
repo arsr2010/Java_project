@@ -1,0 +1,26 @@
+gloabl:
+  host: "*"
+replicaCount: 1
+//UCID_ENDPOINT : HTTP://UCIDLOYALTY-SVC
+//ACTIVE: dev |qa | stage
+#containerport
+#port: 2224
+port: 8080
+imagePullSecrets:
+image:
+  repository: <<earn-service>>
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  name: <<earn-service>>
+  namespace: <<loyalty-dev>>
+  type: ClusterIP
+  port: 80
+  #target port: 2224
+  targetport:8080
+ingress:
+  prefix: /dev/earns
+  rewrite: /earns
+  prefix1: /dev/earn/health
+  rewrite: /acurator/health
+  
