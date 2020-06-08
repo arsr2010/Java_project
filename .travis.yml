@@ -47,21 +47,16 @@ script:
   - helm package k8s/ -d home/travis/.m2/helmrepo/
   - echo "package build successful"
   - cd home/travis/.m2/helmrepo/
-  - curl https://hbc.jfrog.io/
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  - curl https://hbc.jfrog.io/hbc/hbc-helm-ei/Travis/ -H "X-JFrog-Art-Api:$ARTFACTORY_PASSWORD" -T *.tgz ||travis_terminate 1;
+  - echo "Helm package pushed to jfrog successful"
+ #deploy to dev namespace
+  - helm repo add hbc-helm-v-ei $HELM_VREPO --username $ARTIFACTORY_USER --password $ARTIFACTORY_PASSWORD" || travis_terminate 1;
+  - helm repo update ||travis_terminate 1;
+  - if [ $TRAVIS_BRANCH = 'development' ]; then helm upgrade --install $RELEASE -n loyalty-dev  hbc-helm-v-ei/${RELEASE} --set imagePullSecrets=${IMG_PULL_SECRET} --set image.repository=hbc-hbc-docker-v-ei.jfrog.io/${DOCKER_IMAGE},image.tag=${GIT_COMMIT} --set ACTIVE=dev --set service.namespace=loyalty-dev --set service.name=${RELEASE} --set ingress.prefix=/dev/earns; fi              
+  - if [ $TRAVIS_BRANCH = 'qa' ]; then helm upgrade --install $RELEASE -n loyalty-qa  hbc-helm-v-ei/${RELEASE} --set imagePullSecrets=${IMG_PULL_SECRET} --set image.repository=hbc-hbc-docker-v-ei.jfrog.io/${DOCKER_IMAGE},image.tag=${GIT_COMMIT} --set ACTIVE=qa --set service.namespace=loyalty-qa --set service.name=${RELEASE} --set ingress.prefix=/dev/earns; fi              
+  - if [ $TRAVIS_BRANCH = 'stg' ]; then helm upgrade --install $RELEASE -n loyalty-stg  hbc-helm-v-ei/${RELEASE} --set imagePullSecrets=${IMG_PULL_SECRET} --set image.repository=hbc-hbc-docker-v-ei.jfrog.io/${DOCKER_IMAGE},image.tag=${GIT_COMMIT} --set ACTIVE=stg --set service.namespace=loyalty-stg --set service.name=${RELEASE} --set ingress.prefix=/dev/earns; fi              
+notifications:
+  slack:
+after_success:
+  - echo "app deployed successfully done"
+ 
