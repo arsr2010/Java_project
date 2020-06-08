@@ -27,4 +27,14 @@ spec:
             - name: http
               containerPort:  {{ .Values.port }}
               protocol: TCP
+          env: 
+            - name: ACTIVE
+              value: {{ .Values.ACTIVE | quote }}
+           {{- if eq .Values.ACTIVE "dev" }} 
+            - name: MERKEL_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: <<loyalty-secret>>
+                  key: <<merkel-secret>>
+            {{- end }}  #same as qa and stage
               
