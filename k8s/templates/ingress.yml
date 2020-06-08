@@ -1,0 +1,34 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+   name: {{ .Values.service.name }}
+   namespace: {{ .Values.service.namespace }}
+spec:
+  hosts:
+    - "{{ .Values.global.host }}"
+  gateways:
+    - {{ .Values.service.namespace }}-gateway
+  http:
+  - match:
+      - uri: 
+           exact: "{{ .Values.ingress.prefix1 }}"
+     rewrite: 
+       uri: "{{ .Values.ingress.rewrite1 }}"
+     route:
+       - destination:
+           host: {{ .Values.service.name }}-svc
+           port:
+             number: {{ .Values.service.port }}
+  - match:
+      - uri: 
+           exact: "{{ .Values.ingress.prefix }}"
+     rewrite: 
+       uri: "{{ .Values.ingress.rewrite }}"
+     route:
+       - destination:
+           host: {{ .Values.service.name }}-svc
+           port:
+             number: {{ .Values.service.port }}
+       
+           
