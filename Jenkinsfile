@@ -23,6 +23,7 @@ pipeline {
       stage('stage three'){
             steps {
                 echo "stage 3 triggerd"
+                echo "Hi "
             }
         }
     }
