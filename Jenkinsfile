@@ -22,7 +22,7 @@ pipeline {
         }
       stage('stage three'){
             steps {
-                echo "stage 3"
+                echo "stage 3 triggerd"
             }
         }
     }
