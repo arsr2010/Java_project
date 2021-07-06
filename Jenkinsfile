@@ -11,9 +11,9 @@ pipeline {
         stage('stage one') {
             steps {
                 script {
-                    echo "stage 1"
+                sh    " git branch: 'development', credentialsId: '78ff28dc-af4a-4433-86b5-49dc2076c7f3', url: 'https://github.com/arsr2010/Java_project.git'"
                 }
-                echo "tags_extra: ${tags_extra}"            }
+                           }
         }
         stage('stage two') {
             steps {
